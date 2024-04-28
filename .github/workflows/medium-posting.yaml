@@ -1,0 +1,58 @@
+name: Posting To Medium
+on:
+  push:
+    paths:
+      - 'posting/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests markdown
+
+      - name: Fetching changes
+        id: fetching_changes
+        uses: jitterbit/get-changed-files@v1
+        with:
+          format: 'json'
+
+      - name: Update posts
+        env:
+          USER_ID: ${{ secrets.USER_ID }}
+          ACCESS_TOKEN: ${{ secrets.MEDIUM_ACCESS_TOKEN }}
+        run: |
+          import os
+          import json
+          import requests
+          import markdown
+
+          changed_files = json.loads('${{ steps.fetching_changes.outputs.files }}')
+
+          def post_to_medium(file_path):
+              markdown_content = open(file_path).read()
+              headers = {
+                  'Authorization': f'Bearer {os.environ["ACCESS_TOKEN"]}',
+                  'Content-Type': 'application/json'
+              }
+              data = {
+                  "title": os.path.basename(file_path)[:-3],
+                  "contentFormat": "markdown",
+                  "content": markdown_content,
+                  "publishStatus": "draft",
+              }
+              response = requests.post(f'https://api.medium.com/v1/users/{os.environ["USER_ID"]}/posts', json=data, headers=headers)
+              print(response.json())
+
+          for file_path in markdown_files:
+              post_to_medium(file_path)
