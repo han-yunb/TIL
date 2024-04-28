@@ -24,8 +24,6 @@ jobs:
       - name: Fetching changes
         id: fetching_changes
         uses: jitterbit/get-changed-files@v1
-        with:
-          format: 'json'
 
       - name: Update posts
         run: |
