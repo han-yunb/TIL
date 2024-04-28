@@ -14,10 +14,11 @@ headers = {
 }
 
 data = {
-    "title": posting_file.split('.')[0],
+    "title": posting_file.split('/')[-1][:-3],
     "contentFormat": "markdown",
     "content": posting_content,
-    "publishStatus": "draft",
+    "tags": posting_file.split('/')[1:],
+    "publishStatus": "public",
 }
 
 response = requests.post(f'https://api.medium.com/v1/users/{user_id}/posts', json=data, headers=headers)
