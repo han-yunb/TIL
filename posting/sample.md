@@ -6,7 +6,7 @@ This is my **first** post to *medium* via Github Actions
 
 ```
 this is sample multiple line codes
-...
+.
 ```
 
 `this is inline codes`
